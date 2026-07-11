@@ -476,7 +476,7 @@ const sysInfo = {gpu:"?", hz:"?", storage:"?"};
     ["Resolusi layar", screen.width+"×"+screen.height+" @"+window.devicePixelRatio+"x"],
     ["GPU (terbaca browser)", sysInfo.gpu, "gpu"],
     ["Refresh rate", "mengukur…", "hz"],
-    ["Core CPU (logis)", navigator.hardwareConcurrency ? navigator.hardwareConcurrency+" core" : "tidak terbaca"],
+    ["Core CPU (logis)", navigator.hardwareConcurrency ? navigator.hardwareConcurrency+" core" : "tidak terbaca", null, "jumlah core saja, model chip tidak terbaca — cek dxdiag di bawah"],
     ["RAM (perkiraan)", navigator.deviceMemory ? "≥ "+navigator.deviceMemory+" GB" : "tidak terbaca"],
     ["Kuota storage browser", "…", "sto", "bukan kapasitas disk — cek via wmic di bawah"],
     ["Sentuh layar", HAS_TOUCH ? "Ya ("+navigator.maxTouchPoints+" titik)" : "Tidak"],
