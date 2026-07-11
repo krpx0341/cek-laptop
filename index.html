@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CekLaptop — Uji Laptop Bekas Sebelum Beli</title>
+<meta name="description" content="Uji laptop bekas langsung di tempat, dari browser: layar, keyboard, touchpad, speaker, mic, webcam, baterai — gratis dan open source.">
+<meta property="og:title" content="CekLaptop — Uji Laptop Bekas Sebelum Beli">
+<meta property="og:description" content="Uji laptop bekas langsung di tempat, dari browser — gratis, open source, tanpa install.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/7.css">
+<style>
+:root{
+  --bg:#F2F5F7; --panel:#FFFFFF; --ink:#16202B; --ink-soft:#5B6B7A;
+  --line:#D8E0E6; --accent:#E8590C; --accent-dark:#C74A08;
+  --pass:#178A4C; --fail:#D2322D; --skip:#8896A3; --amber:#B96A00;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --disp:'Archivo',system-ui,sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(22,32,43,.04), 0 4px 14px rgba(22,32,43,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{font-family:var(--body);background:linear-gradient(160deg,#2E5C8A,#5A93CC);color:var(--ink);line-height:1.55;font-size:15px;min-height:100vh;padding:22px 14px 40px}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+#appWindow{max-width:1020px;margin:0 auto}
+#appWindow > .title-bar .title-bar-text{font-family:var(--disp);font-weight:700;letter-spacing:.2px}
+.window{--w7-w-bg:var(--accent)}
+.title-bar-text{font-family:var(--disp);font-weight:700}
+.window-body{font-family:var(--body)}
+
+header{background:var(--ink);color:#EAF0F4;padding:28px 20px 22px}
+.wrap{max-width:980px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.brand-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand h1{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,38px);letter-spacing:-.5px}
+.brand h1 em{font-style:normal;color:var(--accent)}
+.brand .tag{font-family:var(--mono);font-size:12px;color:#9FB2C0}
+.brand-ig{font-family:var(--mono);font-size:12.5px;color:#9FB2C0;text-decoration:none;white-space:nowrap;border:1px solid #2A3948;border-radius:99px;padding:5px 12px;transition:border-color .15s,color .15s}
+.brand-ig:hover{border-color:var(--accent);color:#EAF0F4}
+.readout{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:1px;background:#2A3948;border:1px solid #2A3948;border-radius:8px;overflow:hidden}
+.readout div{background:#1D2A37;padding:10px 12px}
+.readout .k{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:#8FA3B3}
+.readout .v{font-family:var(--mono);font-size:13.5px;font-weight:600;color:#F3F7FA;margin-top:2px;word-break:break-word}
+.readout .v.warn{color:#FFB35C}
+.readout .note{font-family:var(--mono);font-size:10px;color:#6E8194;margin-top:3px;font-style:italic}
+.hint{margin-top:10px;font-size:12.5px;color:#9FB2C0}
+
+.progress{position:sticky;top:0;z-index:40;background:var(--panel);border-bottom:2px solid #0A0A0A;padding:10px 20px}
+.progress .wrap{display:flex;align-items:center;gap:14px}
+.pbar{flex:1}
+.pbar > div{width:0%;transition:width .3s}
+.pstats{font-family:var(--mono);font-size:12px;color:var(--ink-soft);white-space:nowrap}
+.pstats b{color:var(--ink)}
+
+main{padding:26px 20px 60px}
+section{margin-bottom:34px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--disp);font-weight:700;font-size:20px}
+.sec-head .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+.sec-head p{font-size:13px;color:var(--ink-soft);width:100%}
+
+.window{margin-bottom:16px}
+.window-body.has-space{padding:14px 16px}
+.desc{font-size:13px;color:var(--ink-soft);margin-bottom:12px}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
+
+.btn{background:var(--accent);color:#fff;font-weight:600}
+.btn:hover{background:var(--accent-dark)}
+.btn.ghost{background:silver;color:var(--ink)}
+.btn.sm{font-size:12px}
+.btn.wa{background:#1FAF5E;color:#fff}
+.btn.wa:hover{background:#188C4B}
+
+.verdict{display:flex;gap:6px;flex-shrink:0}
+.verdict button{font-size:12px;font-weight:600;color:var(--ink-soft)}
+.verdict button.on-pass{background:var(--pass);color:#fff}
+.verdict button.on-fail{background:var(--fail);color:#fff}
+.verdict button.on-skip{background:var(--skip);color:#fff}
+
+#pixelOverlay{position:fixed;inset:0;z-index:100;display:none;cursor:pointer}
+#pixelOverlay .label{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-family:var(--mono);font-size:13px;padding:8px 16px;border-radius:99px;pointer-events:none;transition:opacity .4s;text-align:center;max-width:90vw}
+
+.kbd{display:flex;flex-direction:column;gap:5px;overflow-x:auto;padding-bottom:6px}
+.krow{display:flex;gap:5px}
+.key{flex:1 0 auto;min-width:34px;height:38px;border:1.5px solid var(--line);border-radius:6px;background:#FAFCFD;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);user-select:none;padding:0 4px;white-space:nowrap;position:relative}
+.key.hit{background:var(--pass);border-color:var(--pass);color:#fff}
+.key.down{background:var(--accent);border-color:var(--accent);color:#fff}
+.key.chatter{background:var(--fail);border-color:var(--fail);color:#fff}
+.key.chatter::after{content:"2×";position:absolute;top:-7px;right:-4px;background:#fff;color:var(--fail);border:1px solid var(--fail);font-size:9px;border-radius:99px;padding:0 4px;font-weight:700}
+.key.w15{flex-grow:1.5}.key.w2{flex-grow:2}.key.w25{flex-grow:2.5}.key.w6{flex-grow:6.5}
+.kstat{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.kstat b{color:var(--pass)}
+.kstat .roll b{color:var(--accent)}
+.kstat .chat b{color:var(--fail)}
+
+.pointer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.click-target{border:1.5px dashed var(--line);border-radius:8px;padding:16px 8px;text-align:center;font-size:13px;font-weight:600;color:var(--ink-soft);user-select:none;background:#FAFCFD}
+.click-target.done{border-style:solid;border-color:var(--pass);color:var(--pass);background:#EDF7F1}
+.click-target.bad{border-style:solid;border-color:var(--fail);color:var(--fail);background:#FBECEC}
+#trail{width:100%;height:170px;border:1.5px solid var(--line);border-radius:8px;background:#FAFCFD;touch-action:none;display:block}
+#scrollBox{height:120px;overflow-y:scroll;border:1.5px solid var(--line);border-radius:8px;background:#FAFCFD;padding:12px;font-size:13px;color:var(--ink-soft);margin-top:10px}
+#scrollBox .fill{height:900px;background:repeating-linear-gradient(180deg,#EDF1F4 0 24px,#FAFCFD 24px 48px);border-radius:6px;margin-top:8px}
+.dbl-note{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:8px}
+.dbl-note b.bad{color:var(--fail)}
+
+.tone-row{display:flex;gap:8px;flex-wrap:wrap}
+#micMeter{width:100%;height:16px;background:#E4EAEE;border-radius:99px;overflow:hidden;margin-top:10px}
+#micMeter span{display:block;height:100%;width:0%;background:var(--pass);transition:width .05s linear}
+#camBox{width:100%;max-width:420px;aspect-ratio:4/3;background:#10161C;border-radius:8px;margin-top:10px;overflow:hidden;display:none}
+#camBox video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.media-note{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:8px}
+
+#touchArea{display:none;height:180px;border:1.5px solid var(--line);border-radius:8px;background:#FAFCFD;touch-action:none;position:relative;margin-top:10px;overflow:hidden}
+#touchArea .tip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-soft);pointer-events:none}
+.touch-dot{position:absolute;width:56px;height:56px;border-radius:50%;background:rgba(232,89,12,.25);border:2px solid var(--accent);transform:translate(-50%,-50%);pointer-events:none;font-family:var(--mono);font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--accent-dark);font-weight:700}
+
+.chk{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border-bottom:none}
+.chk .txt{flex:1}
+.chk .txt .t{font-size:14px;font-weight:500}
+.chk .txt .s{font-size:12px;color:var(--ink-soft)}
+.chk-cat{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600;margin:16px 0 2px}
+.chk-cat:first-child{margin-top:0}
+
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.sum-cell{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+.sum-cell .num{font-family:var(--mono);font-size:30px;font-weight:600}
+.sum-cell .lbl{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.sum-cell.pass .num{color:var(--pass)}
+.sum-cell.fail .num{color:var(--fail)}
+.sum-cell.skip .num{color:var(--skip)}
+#verdictBanner{border-radius:10px;padding:16px 18px;font-weight:600;display:none;margin-bottom:16px}
+#verdictBanner.ok{display:block;background:#EDF7F1;border:1.5px solid var(--pass);color:var(--pass)}
+#verdictBanner.warn{display:block;background:#FDF3E7;border:1.5px solid var(--amber);color:var(--amber)}
+#verdictBanner.bad{display:block;background:#FBECEC;border:1.5px solid var(--fail);color:var(--fail)}
+textarea#report{width:100%;height:180px;font-family:var(--mono);font-size:12px;padding:8px;resize:vertical;color:var(--ink)}
+
+.cmd{display:flex;gap:8px;align-items:stretch;margin:8px 0 4px}
+.cmd code{flex:1;font-family:var(--mono);font-size:12.5px;background:#1D2A37;color:#9FE8B8;border-radius:7px;padding:9px 12px;overflow-x:auto;white-space:nowrap;display:flex;align-items:center}
+.cmd .where{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);align-self:center;flex-shrink:0}
+.read-tip{font-size:12.5px;color:var(--ink-soft);border-left:3px solid var(--amber);padding:4px 10px;margin:6px 0 14px;background:#FDF9F3;border-radius:0 6px 6px 0}
+.read-tip b{color:var(--amber)}
+.tool-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tool-row:last-child{border-bottom:none}
+.tool-row .nm{font-weight:600;font-size:14px}
+.tool-row .fn{font-size:12.5px;color:var(--ink-soft)}
+.tool-row .info{flex:1;min-width:220px}
+.tool-row .read{font-size:12.5px;color:var(--ink-soft);max-width:340px;margin-top:2px}
+.tool-dl{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
+.tool-dl-note{width:100%;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:-4px}
+footer{padding:22px 20px 40px;text-align:center;font-size:12.5px;color:var(--ink-soft)}
+footer code{font-family:var(--mono);background:#E4EAEE;padding:1px 6px;border-radius:4px}
+footer a{color:var(--ink-soft);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px}
+footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+footer .credit{margin-top:6px}
+@media(max-width:560px){.card-top{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div class="window active" id="appWindow">
+<div class="title-bar">
+  <div class="title-bar-text">CekLaptop.exe — Uji Laptop Bekas Sebelum Beli</div>
+</div>
+<div class="window-body">
+
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-main">
+        <h1>Cek<em>Laptop</em></h1>
+        <span class="tag">// uji laptop bekas di tempat, langsung dari browser</span>
+      </div>
+      <a class="brand-ig" href="https://instagram.com/menjelangpadam" target="_blank" rel="noopener noreferrer">@menjelangpadam</a>
+    </div>
+    <div class="readout" id="readout"></div>
+    <p class="hint">Angka di atas dibaca langsung dari laptop ini — cocokkan dengan klaim penjual. Sebagian nilai (RAM, core, GPU) adalah pembacaan browser, bukan angka pasti pabrikan.</p>
+  </div>
+</header>
+
+<div class="progress">
+  <div class="wrap">
+    <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="pbarFill"></div></div>
+    <div class="pstats"><b id="pDone">0</b>/<span id="pTotal">0</span> item dinilai</div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section>
+    <div class="sec-head">
+      <span class="n">01</span><h2>Tes Interaktif</h2>
+      <p>Jalankan tiap tes, lalu tandai hasilnya: <b>Lolos</b>, <b>Gagal</b>, atau <b>Lewati</b> kalau tidak relevan.</p>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Dead Pixel, Backlight Bleed &amp; Banding</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Layar penuh berganti pola: 6 warna solid (kuning menguji subpiksel merah+hijau sekaligus), lalu <b>gradasi abu</b> (cari garis-garis bertingkat/banding) dan <b>hitam pekat</b> — di layar hitam, redupkan lampu ruangan dan cari cahaya bocor di tepi layar (backlight bleed). Klik untuk lanjut, <b>Esc</b> keluar.</p>
+          <div class="verdict" data-key="pixel"></div>
+        </div>
+        <button class="btn" id="btnPixel">Mulai Tes Layar (9 pola)</button>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Keyboard: Tombol Mati, Chattering &amp; Rollover</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Tekan tiap tombol — hijau berarti terdeteksi. Tombol <b>merah</b> berarti terdeteksi ganda dalam sekali tekan (chattering, penyakit umum keyboard bekas). Tekan banyak tombol bersamaan untuk mengukur rollover. Catatan: tombol Fn tidak terlihat oleh browser; F1–F12 di sebagian laptop perlu ditekan bersama Fn.</p>
+          <div class="verdict" data-key="keyboard"></div>
+        </div>
+        <div class="kbd" id="kbd"></div>
+        <div class="kstat">
+          <span><b id="keyCount">0</b>/<span id="keyTotal">0</span> tombol terdeteksi</span>
+          <span class="roll">Rollover maks: <b id="rollMax">0</b> tombol serentak</span>
+          <span class="chat">Chattering: <b id="chatCount">0</b> tombol</span>
+          <button class="btn ghost sm" id="keyReset">Ulangi</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Touchpad, Klik &amp; Scroll</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Selesaikan target klik. Target "Klik 1×" mendeteksi <b>double-click liar</b> — kalau berubah merah, tombol klik mendaftar dua kali padahal ditekan sekali (kerusakan umum). Lalu coba scroll dua jari di kotak bergaris dan gambar di kanvas.</p>
+          <div class="verdict" data-key="pointer"></div>
+        </div>
+        <div class="pointer-grid">
+          <div class="click-target" id="tLeft">Klik Kiri</div>
+          <div class="click-target" id="tRight">Klik Kanan</div>
+          <div class="click-target" id="tDouble">Klik Ganda</div>
+          <div class="click-target" id="tSingle">Klik 1× (deteksi double-click liar)</div>
+        </div>
+        <div class="dbl-note" id="dblNote">Belum ada klik liar terdeteksi.</div>
+        <canvas id="trail"></canvas>
+        <div id="scrollBox"><b>Scroll dua jari di sini</b> — gerakan harus halus, tidak loncat atau terbalik.<div class="fill"></div></div>
+        <div class="dbl-note" id="scrollNote"></div>
+      </div>
+    </div>
+
+    <div class="window" id="touchCard" style="display:none">
+      <div class="title-bar"><div class="title-bar-text">Layar Sentuh Multi-Touch</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Laptop ini terdeteksi punya layar sentuh. Sentuh area di bawah dengan beberapa jari sekaligus — semua titik harus muncul dan mengikuti gerakan.</p>
+          <div class="verdict" data-key="touch"></div>
+        </div>
+        <div id="touchArea"><div class="tip" id="touchTip">sentuh dengan beberapa jari sekaligus</div></div>
+        <div class="media-note" id="touchNote"></div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Speaker Kiri / Kanan</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Putar nada per kanal — suara harus keluar dari sisi yang benar, jernih, tidak pecah. Sweep frekuensi membongkar speaker sember di frekuensi tertentu.</p>
+          <div class="verdict" data-key="speaker"></div>
+        </div>
+        <div class="tone-row">
+          <button class="btn ghost" data-tone="left">◀ Kiri</button>
+          <button class="btn ghost" data-tone="both">Keduanya</button>
+          <button class="btn ghost" data-tone="right">Kanan ▶</button>
+          <button class="btn ghost" data-tone="sweep">Sweep 200Hz–8kHz</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Mikrofon</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Izinkan akses mikrofon, lalu bicara — meter harus bergerak mengikuti suaramu.</p>
+          <div class="verdict" data-key="mic"></div>
+        </div>
+        <button class="btn" id="btnMic">Tes Mikrofon</button>
+        <div id="micMeter"><span></span></div>
+        <div class="media-note" id="micNote"></div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Webcam</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Pastikan gambar jernih, warna normal, tanpa bintik/garis pada sensor. Resolusi kamera ditampilkan di bawah.</p>
+          <div class="verdict" data-key="cam"></div>
+        </div>
+        <button class="btn" id="btnCam">Nyalakan Kamera</button>
+        <button class="btn ghost" id="btnCamStop" style="display:none">Matikan</button>
+        <div id="camBox"><video id="camVideo" autoplay playsinline muted></video></div>
+        <div class="media-note" id="camNote"></div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Baterai</div></div>
+      <div class="window-body has-space">
+        <div class="card-top">
+          <p class="desc">Data dari Battery API browser (jika didukung). Untuk battery health akurat, jalankan <span style="font-family:var(--mono)">powercfg /batteryreport</span> di Command Prompt Windows dan bandingkan Design vs Full Charge Capacity.</p>
+          <div class="verdict" data-key="battery"></div>
+        </div>
+        <div class="media-note" id="batInfo">Membaca info baterai…</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="n">02</span><h2>Checklist Manual</h2>
+      <p>Hal-hal yang harus dicek langsung dengan mata dan tangan — browser tidak bisa membantu di sini.</p>
+    </div>
+    <div class="window"><div class="window-body has-space" id="manualList"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="n">03</span><h2>Toolkit Lanjutan</h2>
+      <p>Browser tidak bisa membaca hardware level rendah (SMART disk, wear baterai, suhu). Gunakan perintah bawaan Windows di bawah — salin, lalu tempel di laptop yang dites.</p>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Perintah Bawaan Windows (tanpa install)</div></div>
+      <div class="window-body has-space">
+      <p class="desc">Buka Command Prompt: tekan <b>Win+R</b>, ketik <span style="font-family:var(--mono)">cmd</span>, Enter. Lalu tempel perintah dan tekan Enter.</p>
+
+      <div class="cmd"><code>powercfg /batteryreport</code><button class="btn ghost sm btn-copy-cmd">Salin</button><span class="where">CMD</span></div>
+      <div class="read-tip"><b>Cara baca:</b> buka file battery-report.html yang dibuat. Bandingkan <i>Design Capacity</i> vs <i>Full Charge Capacity</i>. Sisa di bawah <b>80%</b> = baterai sudah aus, bahan nego. Di bawah 60% = siap-siap biaya ganti baterai.</div>
+
+      <div class="cmd"><code>wmic diskdrive get model,status,size</code><button class="btn ghost sm btn-copy-cmd">Salin</button><span class="where">CMD</span></div>
+      <div class="read-tip"><b>Cara baca:</b> Status harus <b>OK</b>. Sekalian cocokkan model &amp; kapasitas drive dengan klaim iklan (SSD vs HDD kelihatan dari nama modelnya).</div>
+
+      <div class="cmd"><code>dxdiag</code><button class="btn ghost sm btn-copy-cmd">Salin</button><span class="where">Win+R</span></div>
+      <div class="read-tip"><b>Cara baca:</b> tab System = CPU &amp; RAM asli, tab Display = GPU asli. Cocokkan dengan iklan dan dengan pembacaan GPU di header halaman ini.</div>
+
+      <div class="cmd"><code>slmgr /xpr</code><button class="btn ghost sm btn-copy-cmd">Salin</button><span class="where">CMD</span></div>
+      <div class="read-tip"><b>Cara baca:</b> menampilkan status aktivasi Windows — permanen, sementara, atau tidak aktif. Kalau penjual mengklaim "Windows original", di sinilah buktinya.</div>
+
+      <div class="cmd"><code>wmic bios get serialnumber</code><button class="btn ghost sm btn-copy-cmd">Salin</button><span class="where">CMD</span></div>
+      <div class="read-tip"><b>Cara baca:</b> nomor seri dari BIOS — harus sama dengan stiker di body dan dus/invoice. Beda = tanda ganti motherboard atau unit tidak sesuai.</div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Aplikasi Portable (siapkan di flashdisk)</div></div>
+      <div class="window-body has-space">
+      <p class="desc">Semua gratis dan punya versi portable — jalan tanpa install. Tombol "Unduh" membuka halaman resmi vendor (bukan link file langsung, karena nomor versi sering berubah) — unduh sekali di rumah, pilih edisi <b>Zip/Portable</b>, simpan di flashdisk.</p>
+      <div id="toolList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="n">04</span><h2>Ringkasan &amp; Laporan</h2>
+    </div>
+    <div class="summary-grid">
+      <div class="sum-cell pass"><div class="num" id="sumPass">0</div><div class="lbl">Lolos</div></div>
+      <div class="sum-cell fail"><div class="num" id="sumFail">0</div><div class="lbl">Gagal</div></div>
+      <div class="sum-cell skip"><div class="num" id="sumSkip">0</div><div class="lbl">Dilewati</div></div>
+      <div class="sum-cell"><div class="num" id="sumLeft">0</div><div class="lbl">Belum dinilai</div></div>
+    </div>
+    <div id="verdictBanner"></div>
+    <div class="window">
+      <div class="title-bar"><div class="title-bar-text">Laporan</div></div>
+      <div class="window-body has-space">
+      <p class="desc">Laporan otomatis menyertakan spesifikasi yang terbaca (GPU, refresh rate, dll). Kirim ke diri sendiri sebagai catatan sebelum nego harga.</p>
+      <textarea id="report" readonly></textarea>
+      <div class="tone-row" style="margin-top:10px">
+        <button class="btn" id="btnCopy">Salin Laporan</button>
+        <button class="btn wa" id="btnWA">Kirim via WhatsApp</button>
+        <button class="btn ghost" id="btnJSON">Unduh JSON</button>
+        <button class="btn ghost" id="btnReset">Reset Semua</button>
+      </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="pixelOverlay"><div class="label" id="pixelLabel"></div></div>
+
+<footer>
+  Semua tes berjalan lokal di browser — tidak ada data yang dikirim ke mana pun.
+  <div class="credit">
+    Dibuat oleh <a href="https://instagram.com/menjelangpadam" target="_blank" rel="noopener noreferrer">@menjelangpadam</a>
+    · Open source di bawah lisensi <a href="https://github.com/krpx0341/cek-laptop/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GPL-3.0</a>
+    · <a href="https://github.com/krpx0341/cek-laptop" target="_blank" rel="noopener noreferrer">Kontribusi &amp; source code di GitHub</a>
+  </div>
+</footer>
+
+</div>
+</div>
+
+<script>
+"use strict";
+/* ============ Storage ============ */
+const store = (() => {
+  let mem = {}; let ok = false;
+  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok = true; } catch(e){}
+  return {
+    get(k){ try { return ok ? JSON.parse(localStorage.getItem(k)) : (mem[k] ?? null); } catch(e){ return mem[k] ?? null; } },
+    set(k,v){ mem[k]=v; if(ok){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } },
+    clear(){ mem={}; if(ok){ try{ localStorage.removeItem("ceklaptop"); }catch(e){} } }
+  };
+})();
+
+/* ============ State & item defs ============ */
+const HAS_TOUCH = navigator.maxTouchPoints > 0;
+const TESTS = [
+  {key:"pixel",    label:"Dead pixel, backlight bleed & banding"},
+  {key:"keyboard", label:"Keyboard (tombol mati, chattering, rollover)"},
+  {key:"pointer",  label:"Touchpad, klik & scroll"},
+  ...(HAS_TOUCH ? [{key:"touch", label:"Layar sentuh multi-touch"}] : []),
+  {key:"speaker",  label:"Speaker kiri/kanan"},
+  {key:"mic",      label:"Mikrofon"},
+  {key:"cam",      label:"Webcam"},
+  {key:"battery",  label:"Baterai"},
+];
+const MANUAL = [
+  ["Fisik", [
+    ["Body & casing", "Tidak retak, penyok parah, atau bekas jatuh"],
+    ["Engsel layar", "Kokoh, tidak longgar, tidak berbunyi saat dibuka-tutup"],
+    ["Port & lubang charger", "Tidak longgar, colokan charger mengunci rapat"],
+    ["Baterai tidak menggembung", "Bagian bawah/keyboard tidak menonjol"],
+    ["Bekas servis", "Baut bawah tidak dol/cacat obeng — indikasi pernah dibongkar"],
+  ]],
+  ["Sistem", [
+    ["Spesifikasi sesuai iklan", "Cek System Info / dxdiag: CPU, RAM, storage — cocokkan juga dengan pembacaan GPU di header halaman ini"],
+    ["Kesehatan SSD/HDD", "CrystalDiskInfo status Good, power-on hours wajar"],
+    ["Battery health", "powercfg /batteryreport — bandingkan design vs full charge capacity"],
+    ["Device Manager bersih", "Tidak ada tanda seru / driver bermasalah"],
+    ["Suhu wajar saat load", "Tidak overheat atau kipas menjerit saat dipakai berat"],
+    ["WiFi & Bluetooth", "Koneksi stabil, pairing perangkat lain berhasil"],
+    ["Semua port USB / HDMI", "Tes colok flashdisk dan monitor eksternal"],
+  ]],
+  ["Legalitas & Transaksi", [
+    ["Nomor seri cocok", "S/N di body = S/N di BIOS = dus/invoice (jika ada)"],
+    ["Bukan barang kredit macet", "Pastikan tidak dalam status cicilan belum lunas"],
+    ["Akun tertaut sudah keluar", "Tidak terkunci akun Microsoft/Google/iCloud milik penjual"],
+    ["Garansi tertulis", "Sepakati garansi personal/toko secara tertulis"],
+    ["Harga wajar", "Bandingkan dengan listing serupa di marketplace"],
+  ]],
+];
+MANUAL.forEach(([cat, items], ci) => items.forEach((it, ii) => it.push("m"+ci+"_"+ii)));
+
+let state = store.get("ceklaptop") || {};
+function save(){ store.set("ceklaptop", state); }
+
+/* ============ Live readout (spek + GPU + refresh rate + storage) ============ */
+const sysInfo = {gpu:"?", hz:"?", storage:"?"};
+(function(){
+  const R = document.getElementById("readout");
+  // GPU via WebGL
+  try{
+    const c = document.createElement("canvas");
+    const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+    if (gl){
+      const ext = gl.getExtension("WEBGL_debug_renderer_info");
+      sysInfo.gpu = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : (gl.getParameter(gl.RENDERER)||"?");
+      sysInfo.gpu = String(sysInfo.gpu).replace(/ANGLE \(|\)$/g,"").split(",").slice(0,2).join(",").trim();
+    }
+  }catch(e){}
+  const rows = [
+    ["Resolusi layar", screen.width+"×"+screen.height+" @"+window.devicePixelRatio+"x"],
+    ["GPU (terbaca browser)", sysInfo.gpu, "gpu"],
+    ["Refresh rate", "mengukur…", "hz"],
+    ["Core CPU (logis)", navigator.hardwareConcurrency ? navigator.hardwareConcurrency+" core" : "tidak terbaca"],
+    ["RAM (perkiraan)", navigator.deviceMemory ? "≥ "+navigator.deviceMemory+" GB" : "tidak terbaca"],
+    ["Kuota storage browser", "…", "sto", "bukan kapasitas disk — cek via wmic di bawah"],
+    ["Sentuh layar", HAS_TOUCH ? "Ya ("+navigator.maxTouchPoints+" titik)" : "Tidak"],
+    ["Baterai", "…", "bat"],
+  ];
+  R.innerHTML = rows.map(r=>'<div><div class="k">'+r[0]+'</div><div class="v" '+(r[2]?('id="ro_'+r[2]+'"'):"")+'>'+r[1]+'</div>'+(r[3]?('<div class="note">'+r[3]+'</div>'):"")+'</div>').join("");
+
+  // Refresh rate via rAF sampling
+  (function(){
+    let frames = 0, start = performance.now();
+    function tick(now){
+      frames++;
+      if (now - start >= 1000){
+        const hz = Math.round(frames / ((now-start)/1000));
+        sysInfo.hz = hz + " Hz";
+        document.getElementById("ro_hz").textContent = "±"+hz+" Hz";
+      } else requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
+  // Storage estimate
+  if (navigator.storage && navigator.storage.estimate){
+    navigator.storage.estimate().then(e=>{
+      if (e.quota){
+        const gb = (e.quota/1e9).toFixed(0);
+        sysInfo.storage = "~"+gb+" GB kuota browser";
+        document.getElementById("ro_sto").textContent = sysInfo.storage;
+      } else document.getElementById("ro_sto").textContent = "tidak terbaca";
+    }).catch(()=>document.getElementById("ro_sto").textContent = "tidak terbaca");
+  } else document.getElementById("ro_sto").textContent = "tidak terbaca";
+
+  // Battery
+  function fmtDur(sec){
+    const totalMin = Math.round(sec/60);
+    const h = Math.floor(totalMin/60), m = totalMin%60;
+    return h>0 ? (h+" jam "+m+" menit") : (m+" menit");
+  }
+  function fmtBat(b){
+    const el = document.getElementById("ro_bat"); if(!el) return;
+    const pct = Math.round(b.level*100);
+    el.textContent = pct+"% "+(b.charging ? "⚡ mengisi" : "· tidak mengisi");
+    el.classList.toggle("warn", pct < 25 && !b.charging);
+    const info = document.getElementById("batInfo");
+    let extra = "";
+    if (b.charging && isFinite(b.chargingTime) && b.chargingTime>0) extra = " · penuh dalam ±"+fmtDur(b.chargingTime);
+    if (!b.charging && isFinite(b.dischargingTime) && b.dischargingTime>0) extra = " · perkiraan tahan ±"+fmtDur(b.dischargingTime);
+    info.textContent = "Level "+pct+"% · "+(b.charging?"sedang mengisi":"pakai baterai")+extra;
+  }
+  if (navigator.getBattery) {
+    navigator.getBattery().then(b=>{
+      fmtBat(b);
+      ["levelchange","chargingchange","chargingtimechange","dischargingtimechange"].forEach(ev=>b.addEventListener(ev,()=>fmtBat(b)));
+    }).catch(()=>{ document.getElementById("ro_bat").textContent="tidak terbaca"; });
+  } else {
+    document.getElementById("ro_bat").textContent = "API tidak didukung";
+    document.getElementById("batInfo").textContent = "Browser ini tidak mendukung Battery API — gunakan powercfg /batteryreport di Windows.";
+  }
+})();
+
+/* ============ Verdicts ============ */
+const VOPT = [["pass","Lolos"],["fail","Gagal"],["skip","Lewati"]];
+function renderVerdicts(){
+  document.querySelectorAll(".verdict").forEach(v=>{
+    const key = v.dataset.key;
+    v.innerHTML = VOPT.map(([val,lbl])=>{
+      const on = state[key]===val ? (' class="on-'+val+'"') : "";
+      return '<button'+on+' data-v="'+val+'">'+lbl+'</button>';
+    }).join("");
+    v.querySelectorAll("button").forEach(b=>{
+      b.onclick = ()=>{
+        state[key] = (state[key]===b.dataset.v) ? null : b.dataset.v;
+        save(); renderVerdicts(); updateSummary();
+      };
+    });
+  });
+}
+
+/* ============ Pixel test: 6 warna + gradasi + checkerboard + hitam bleed ============ */
+(function(){
+  const patterns = [
+    {bg:"#FFFFFF", name:"Putih — cari titik gelap & debu"},
+    {bg:"#000000", name:"Hitam — cari titik menyala"},
+    {bg:"#FF0000", name:"Merah — subpiksel merah"},
+    {bg:"#00FF00", name:"Hijau — subpiksel hijau"},
+    {bg:"#0000FF", name:"Biru — subpiksel biru"},
+    {bg:"#FFFF00", name:"Kuning — merah+hijau sekaligus"},
+    {bg:"linear-gradient(90deg,#000,#FFF)", name:"Gradasi — cari garis bertingkat (banding)"},
+    {bg:"repeating-conic-gradient(#000 0% 25%, #FFF 0% 50%) 0 0/8px 8px", name:"Papan catur — ketajaman & piksel non-native"},
+    {bg:"#000000", name:"BACKLIGHT BLEED — redupkan lampu, cari cahaya bocor di tepi layar"},
+  ];
+  const ov = document.getElementById("pixelOverlay");
+  const lbl = document.getElementById("pixelLabel");
+  let i = 0, hideTimer;
+  function show(){
+    ov.style.background = patterns[i].bg;
+    lbl.textContent = patterns[i].name+" ("+(i+1)+"/"+patterns.length+") — klik lanjut, Esc keluar";
+    lbl.style.opacity = 1;
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(()=>lbl.style.opacity=0, 2600);
+  }
+  function open(){
+    i = 0; ov.style.display = "block"; show();
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+  }
+  function close(){
+    ov.style.display = "none";
+    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  }
+  document.getElementById("btnPixel").onclick = open;
+  ov.onclick = ()=>{ i++; if(i>=patterns.length) close(); else show(); };
+  document.addEventListener("keydown", e=>{
+    if (ov.style.display!=="block") return;
+    if (e.key==="Escape") close();
+    else { e.preventDefault(); i++; if(i>=patterns.length) close(); else show(); }
+  });
+})();
+
+/* ============ Keyboard: hit + chattering + rollover ============ */
+(function(){
+  const rows = [
+    [["Escape","Esc"],["F1"],["F2"],["F3"],["F4"],["F5"],["F6"],["F7"],["F8"],["F9"],["F10"],["F11"],["F12"],["Delete","Del"]],
+    [["Backquote","`"],["Digit1","1"],["Digit2","2"],["Digit3","3"],["Digit4","4"],["Digit5","5"],["Digit6","6"],["Digit7","7"],["Digit8","8"],["Digit9","9"],["Digit0","0"],["Minus","-"],["Equal","="],["Backspace","⌫","w2"]],
+    [["Tab","Tab","w15"],["KeyQ","Q"],["KeyW","W"],["KeyE","E"],["KeyR","R"],["KeyT","T"],["KeyY","Y"],["KeyU","U"],["KeyI","I"],["KeyO","O"],["KeyP","P"],["BracketLeft","["],["BracketRight","]"],["Backslash","\\","w15"]],
+    [["CapsLock","Caps","w2"],["KeyA","A"],["KeyS","S"],["KeyD","D"],["KeyF","F"],["KeyG","G"],["KeyH","H"],["KeyJ","J"],["KeyK","K"],["KeyL","L"],["Semicolon",";"],["Quote","'"],["Enter","Enter","w2"]],
+    [["ShiftLeft","Shift","w25"],["KeyZ","Z"],["KeyX","X"],["KeyC","C"],["KeyV","V"],["KeyB","B"],["KeyN","N"],["KeyM","M"],["Comma",","],["Period","."],["Slash","/"],["ShiftRight","Shift","w25"]],
+    [["ControlLeft","Ctrl","w15"],["MetaLeft","Win/⌘"],["AltLeft","Alt"],["Space","Space","w6"],["AltRight","Alt"],["ControlRight","Ctrl","w15"],["ArrowLeft","←"],["ArrowUp","↑"],["ArrowDown","↓"],["ArrowRight","→"]],
+  ];
+  const kbd = document.getElementById("kbd");
+  const hits = new Set(state.__keys || []);
+  const chatter = new Set(state.__chatter || []);
+  const keyEls = {};
+  const lastUp = {};       // untuk deteksi chattering: keyup lalu keydown lagi < 60ms
+  const downNow = new Set();
+  let rollMax = state.__roll || 0;
+  let total = 0;
+  kbd.innerHTML = rows.map(r=>'<div class="krow">'+r.map(k=>{
+    total++;
+    return '<span class="key '+(k[2]||"")+'" data-code="'+k[0]+'">'+(k[1]||k[0])+'</span>';
+  }).join("")+'</div>').join("");
+  kbd.querySelectorAll(".key").forEach(el=>{
+    keyEls[el.dataset.code] = el;
+    if (hits.has(el.dataset.code)) el.classList.add("hit");
+    if (chatter.has(el.dataset.code)) el.classList.add("chatter");
+  });
+  document.getElementById("keyTotal").textContent = total;
+  const cnt = document.getElementById("keyCount");
+  const rollEl = document.getElementById("rollMax");
+  const chatEl = document.getElementById("chatCount");
+  function upd(){
+    cnt.textContent = hits.size;
+    rollEl.textContent = rollMax;
+    chatEl.textContent = chatter.size;
+  }
+  upd();
+  document.addEventListener("keydown", e=>{
+    if (document.getElementById("pixelOverlay").style.display==="block") return;
+    if (e.target.tagName==="TEXTAREA" || e.target.tagName==="INPUT") return;
+    const el = keyEls[e.code];
+    if (!el) return;
+    e.preventDefault();
+    if (e.repeat) return; // abaikan auto-repeat OS
+    // deteksi chattering: tombol baru saja dilepas < 60ms lalu turun lagi
+    if (lastUp[e.code] && (performance.now() - lastUp[e.code]) < 60){
+      chatter.add(e.code);
+      el.classList.add("chatter");
+      state.__chatter = [...chatter];
+    }
+    el.classList.add("down","hit");
+    hits.add(e.code);
+    downNow.add(e.code);
+    if (downNow.size > rollMax){ rollMax = downNow.size; state.__roll = rollMax; }
+    state.__keys = [...hits]; save(); upd();
+  });
+  document.addEventListener("keyup", e=>{
+    const el=keyEls[e.code];
+    if(el){ el.classList.remove("down"); lastUp[e.code] = performance.now(); }
+    downNow.delete(e.code);
+  });
+  window.addEventListener("blur", ()=>downNow.clear());
+  document.getElementById("keyReset").onclick = ()=>{
+    hits.clear(); chatter.clear(); rollMax = 0;
+    state.__keys=[]; state.__chatter=[]; state.__roll=0; save(); upd();
+    kbd.querySelectorAll(".key").forEach(el=>el.classList.remove("hit","down","chatter"));
+  };
+  window.__kbdStats = ()=>({hit:hits.size, total, roll:rollMax, chatter:chatter.size});
+})();
+
+/* ============ Pointer: klik + double-click liar + trail + scroll ============ */
+(function(){
+  const done = (id)=>{ const el=document.getElementById(id); el.classList.add("done"); if(!el.textContent.startsWith("✓")) el.textContent = "✓ "+el.textContent; };
+  document.getElementById("tLeft").addEventListener("click", ()=>done("tLeft"));
+  document.getElementById("tRight").addEventListener("contextmenu", e=>{ e.preventDefault(); done("tRight"); });
+  document.getElementById("tDouble").addEventListener("dblclick", ()=>done("tDouble"));
+
+  // Deteksi double-click liar: dua event click < 80ms di target "klik sekali"
+  const single = document.getElementById("tSingle");
+  const note = document.getElementById("dblNote");
+  let lastClick = 0, ghostCount = state.__ghost || 0;
+  function updGhost(){
+    if (ghostCount>0){
+      single.classList.add("bad"); single.classList.remove("done");
+      single.textContent = "✗ Double-click liar terdeteksi";
+      note.innerHTML = '<b class="bad">'+ghostCount+'× klik ganda liar</b> — tombol klik mendaftar 2× padahal ditekan sekali. Ini kerusakan mekanis switch.';
+    } else {
+      note.textContent = "Belum ada klik liar terdeteksi. Klik target di atas berkali-kali (pelan) untuk memastikan.";
+    }
+  }
+  updGhost();
+  single.addEventListener("click", ()=>{
+    const now = performance.now();
+    if (now - lastClick < 80){
+      ghostCount++; state.__ghost = ghostCount; save(); updGhost();
+    } else if (ghostCount===0){
+      single.classList.add("done");
+      if(!single.textContent.startsWith("✓")) single.textContent = "✓ "+single.textContent;
+    }
+    lastClick = now;
+  });
+
+  // Trail canvas
+  const cv = document.getElementById("trail");
+  const ctx = cv.getContext("2d");
+  function resize(){
+    const r = cv.getBoundingClientRect();
+    cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#E8590C";
+    ctx.fillStyle = "#8896A3"; ctx.font = "12px JetBrains Mono, monospace";
+    ctx.fillText("gerakkan kursor / jari di sini — garis harus mulus", 12, 22);
+  }
+  resize(); window.addEventListener("resize", resize);
+  let last = null;
+  cv.addEventListener("pointermove", e=>{
+    const r = cv.getBoundingClientRect();
+    const p = {x:e.clientX-r.left, y:e.clientY-r.top};
+    if (last){ ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); }
+    last = p;
+  });
+  cv.addEventListener("pointerleave", ()=>last=null);
+
+  // Scroll test
+  const sb = document.getElementById("scrollBox");
+  const sn = document.getElementById("scrollNote");
+  let sUp=false, sDown=false;
+  sb.addEventListener("scroll", ()=>{
+    if (sb.scrollTop > 40) sDown = true;
+    if (sDown && sb.scrollTop < 10) sUp = true;
+    if (sDown && sUp) sn.textContent = "✓ Scroll dua arah terdeteksi.";
+    else if (sDown) sn.textContent = "Scroll ke bawah OK — sekarang scroll kembali ke atas.";
+  });
+})();
+
+/* ============ Multi-touch (hanya jika layar sentuh) ============ */
+if (HAS_TOUCH) (function(){
+  document.getElementById("touchCard").style.display = "";
+  const area = document.getElementById("touchArea");
+  area.style.display = "block";
+  const tip = document.getElementById("touchTip");
+  const note = document.getElementById("touchNote");
+  const dots = {};
+  let maxPts = state.__touchMax || 0;
+  function upd(){ note.textContent = "Titik serentak maksimum: "+maxPts+" (klaim perangkat: "+navigator.maxTouchPoints+")"; }
+  upd();
+  area.addEventListener("pointerdown", e=>{
+    if (e.pointerType!=="touch") return;
+    tip.style.display="none";
+    const d = document.createElement("div");
+    d.className="touch-dot"; d.textContent = Object.keys(dots).length+1;
+    area.appendChild(d); dots[e.pointerId]=d;
+    move(e);
+    const n = Object.keys(dots).length;
+    if (n>maxPts){ maxPts=n; state.__touchMax=maxPts; save(); upd(); }
+  });
+  function move(e){
+    const d = dots[e.pointerId]; if(!d) return;
+    const r = area.getBoundingClientRect();
+    d.style.left = (e.clientX-r.left)+"px";
+    d.style.top = (e.clientY-r.top)+"px";
+  }
+  area.addEventListener("pointermove", move);
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>area.addEventListener(ev, e=>{
+    const d = dots[e.pointerId];
+    if (d){ d.remove(); delete dots[e.pointerId]; }
+    if (!Object.keys(dots).length) tip.style.display="";
+  }));
+})();
+
+/* ============ Speaker ============ */
+(function(){
+  let ac;
+  function play(mode){
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    if (ac.state === "suspended") ac.resume();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    const pan = ac.createStereoPanner ? ac.createStereoPanner() : null;
+    osc.type = "sine";
+    gain.gain.value = 0.25;
+    const dur = mode==="sweep" ? 3 : 1.2;
+    if (mode==="sweep"){
+      osc.frequency.setValueAtTime(200, ac.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(8000, ac.currentTime + dur);
+    } else osc.frequency.value = 440;
+    if (pan){
+      pan.pan.value = mode==="left" ? -1 : mode==="right" ? 1 : 0;
+      osc.connect(gain).connect(pan).connect(ac.destination);
+    } else osc.connect(gain).connect(ac.destination);
+    gain.gain.setValueAtTime(0.25, ac.currentTime + dur - 0.08);
+    gain.gain.linearRampToValueAtTime(0.0001, ac.currentTime + dur);
+    osc.start(); osc.stop(ac.currentTime + dur);
+  }
+  document.querySelectorAll("[data-tone]").forEach(b=> b.onclick = ()=>play(b.dataset.tone));
+})();
+
+/* ============ Mic ============ */
+(function(){
+  const btn = document.getElementById("btnMic");
+  const meter = document.querySelector("#micMeter span");
+  const note = document.getElementById("micNote");
+  let stream, raf;
+  btn.onclick = async ()=>{
+    if (stream){
+      stream.getTracks().forEach(t=>t.stop()); stream=null;
+      cancelAnimationFrame(raf); meter.style.width="0%";
+      btn.textContent = "Tes Mikrofon"; note.textContent = "";
+      return;
+    }
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      const ac = new (window.AudioContext||window.webkitAudioContext)();
+      const src = ac.createMediaStreamSource(stream);
+      const an = ac.createAnalyser(); an.fftSize = 512;
+      src.connect(an);
+      const buf = new Uint8Array(an.frequencyBinCount);
+      btn.textContent = "Hentikan"; note.textContent = "Bicara sekarang — meter harus bergerak.";
+      (function loop(){
+        an.getByteFrequencyData(buf);
+        const avg = buf.reduce((a,b)=>a+b,0)/buf.length;
+        meter.style.width = Math.min(100, avg*1.4) + "%";
+        raf = requestAnimationFrame(loop);
+      })();
+    }catch(e){
+      note.textContent = "Akses mikrofon ditolak atau tidak tersedia. (Perlu HTTPS — GitHub Pages sudah HTTPS.)";
+    }
+  };
+})();
+
+/* ============ Webcam ============ */
+(function(){
+  const btn = document.getElementById("btnCam");
+  const stop = document.getElementById("btnCamStop");
+  const box = document.getElementById("camBox");
+  const vid = document.getElementById("camVideo");
+  const note = document.getElementById("camNote");
+  let stream;
+  btn.onclick = async ()=>{
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({video:true});
+      vid.srcObject = stream;
+      box.style.display = "block"; stop.style.display = "inline-block"; btn.style.display = "none";
+      const s = stream.getVideoTracks()[0].getSettings();
+      note.textContent = s.width ? ("Resolusi kamera: "+s.width+"×"+s.height+(s.frameRate?(" @"+Math.round(s.frameRate)+"fps"):"")) : "";
+    }catch(e){
+      note.textContent = "Akses kamera ditolak atau tidak tersedia. (Perlu HTTPS — GitHub Pages sudah HTTPS.)";
+    }
+  };
+  stop.onclick = ()=>{
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    box.style.display="none"; stop.style.display="none"; btn.style.display="inline-block";
+    note.textContent="";
+  };
+})();
+
+/* ============ Manual checklist ============ */
+(function(){
+  const box = document.getElementById("manualList");
+  box.innerHTML = MANUAL.map(([cat, items]) =>
+    '<div class="chk-cat">'+cat+'</div>' +
+    items.map(([t,s,key]) =>
+      '<div class="chk"><div class="txt"><div class="t">'+t+'</div><div class="s">'+s+'</div></div><div class="verdict" data-key="'+key+'"></div></div>'
+    ).join("")
+  ).join("");
+})();
+
+/* ============ Portable tool list ============ */
+(function(){
+  const TOOLS = [
+    {nm:"CrystalDiskInfo", fn:"Kesehatan SSD/HDD via data SMART",
+     read:'Status harus <b>Good</b> (biru). <b>Caution/Bad</b> = tolak atau minta ganti drive. Power On Hours &gt;15.000 jam = drive sudah kerja keras.',
+     url:"https://crystalmark.info/en/software/crystaldiskinfo/", note:"Di halaman resmi, pilih edisi “Zip” (portable)."},
+    {nm:"HWiNFO", fn:"Suhu CPU/GPU & kecepatan kipas real-time, paling detail",
+     read:"Idle wajar 40–55°C. Kalau idle saja &gt;70°C atau load langsung mentok &gt;95°C = pasta termal kering / kipas bermasalah.",
+     url:"https://www.hwinfo.com/download/", note:"Pilih tautan “Portable” di halaman unduh."},
+    {nm:"HWMonitor", fn:"Alternatif ringan untuk pemantau suhu & voltase",
+     read:"Baca sama seperti HWiNFO — bandingkan suhu idle vs saat load berat.",
+     url:"https://www.cpuid.com/softwares/hwmonitor.html", note:"Pilih edisi “zip” (portable), bukan installer .exe."},
+    {nm:"MemTest86", fn:"Tes RAM menyeluruh (boot dari flashdisk)",
+     read:'Butuh waktu lama — cocok kalau penjual kasih masa garansi uji. Alternatif cepat: Windows Memory Diagnostic (bawaan, ketik <span style="font-family:var(--mono)">mdsched</span> di Run).',
+     url:"https://www.memtest86.com/download.htm", note:"Image untuk bikin USB bootable, bukan aplikasi biasa."},
+    {nm:"CPU-Z", fn:"Verifikasi detail chip CPU & RAM asli",
+     read:'Membongkar laptop "rebranding" — misalnya diiklankan Core i7 padahal i5.',
+     url:"https://www.cpuid.com/softwares/cpu-z.html", note:"Pilih edisi “zip” (portable), bukan installer .exe."},
+    {nm:"GPU-Z", fn:"Verifikasi detail chip GPU asli",
+     read:"Cek VGA dedicated asli vs iklan bohong / chip rebrand lama.",
+     url:"https://www.techpowerup.com/gpuz/", note:"Saat extract, jangan buat shortcut agar tetap portable."},
+  ];
+  document.getElementById("toolList").innerHTML = TOOLS.map(t =>
+    '<div class="tool-row">'+
+      '<div class="info"><div class="nm">'+t.nm+'</div><div class="fn">'+t.fn+'</div></div>'+
+      '<div class="read">'+t.read+'</div>'+
+      '<a class="btn ghost sm tool-dl" href="'+t.url+'" target="_blank" rel="noopener noreferrer">Unduh ↗</a>'+
+      '<div class="tool-dl-note">'+t.note+'</div>'+
+    '</div>'
+  ).join("");
+})();
+
+/* ============ Summary / report ============ */
+function allItems(){
+  const items = TESTS.map(t=>({key:t.key, label:t.label, cat:"Tes interaktif"}));
+  MANUAL.forEach(([cat, list]) => list.forEach(([t,s,key]) => items.push({key, label:t, cat})));
+  return items;
+}
+function reportText(){
+  const items = allItems();
+  let pass=0, fail=0, skip=0;
+  items.forEach(it=>{
+    if (state[it.key]==="pass") pass++;
+    else if (state[it.key]==="fail") fail++;
+    else if (state[it.key]==="skip") skip++;
+  });
+  const done = pass+fail+skip, total = items.length;
+  const d = new Date();
+  const kb = window.__kbdStats ? window.__kbdStats() : null;
+  const lines = [
+    "LAPORAN CEK LAPTOP BEKAS",
+    "Tanggal : "+d.toLocaleDateString("id-ID")+" "+d.toLocaleTimeString("id-ID"),
+    "Layar   : "+screen.width+"x"+screen.height+" @"+devicePixelRatio+"x · "+sysInfo.hz,
+    "GPU     : "+sysInfo.gpu,
+    "CPU/RAM : "+(navigator.hardwareConcurrency||"?")+" core logis · RAM >= "+(navigator.deviceMemory||"?")+" GB (perkiraan browser)",
+  ];
+  if (kb) lines.push("Keyboard: "+kb.hit+"/"+kb.total+" tombol · rollover "+kb.roll+" · chattering "+kb.chatter);
+  lines.push("Hasil   : "+pass+" lolos · "+fail+" gagal · "+skip+" dilewati · "+(total-done)+" belum dinilai");
+  lines.push("-".repeat(46));
+  const mark = v => v==="pass"?"[LOLOS]": v==="fail"?"[GAGAL]": v==="skip"?"[LEWAT]":"[  -  ]";
+  let lastCat = "";
+  items.forEach(it=>{
+    if (it.cat !== lastCat){ lines.push("", "· " + it.cat.toUpperCase()); lastCat = it.cat; }
+    lines.push(mark(state[it.key])+" "+it.label);
+  });
+  return {text: lines.join("\n"), pass, fail, skip, done, total};
+}
+function updateSummary(){
+  const r = reportText();
+  document.getElementById("sumPass").textContent = r.pass;
+  document.getElementById("sumFail").textContent = r.fail;
+  document.getElementById("sumSkip").textContent = r.skip;
+  document.getElementById("sumLeft").textContent = r.total-r.done;
+  document.getElementById("pDone").textContent = r.done;
+  document.getElementById("pTotal").textContent = r.total;
+  document.getElementById("pbarFill").style.width = (r.done/r.total*100) + "%";
+  const vb = document.getElementById("verdictBanner");
+  vb.className = ""; vb.style.display = "none";
+  if (r.done === r.total){
+    if (r.fail === 0){ vb.className="ok"; vb.textContent = "✓ Semua pemeriksaan lolos — laptop ini layak dipertimbangkan. Tetap sepakati garansi tertulis."; }
+    else if (r.fail <= 2){ vb.className="warn"; vb.textContent = "⚠ Ada "+r.fail+" temuan bermasalah. Pertimbangkan sebagai bahan nego harga, atau minta perbaikan dulu."; }
+    else { vb.className="bad"; vb.textContent = "✗ "+r.fail+" item gagal — risiko tinggi. Sebaiknya cari unit lain."; }
+  }
+  document.getElementById("report").value = r.text;
+}
+
+document.getElementById("btnCopy").onclick = async ()=>{
+  const ta = document.getElementById("report");
+  try { await navigator.clipboard.writeText(ta.value); }
+  catch(e){ ta.select(); document.execCommand("copy"); }
+  const b = document.getElementById("btnCopy");
+  const old = b.textContent; b.textContent = "Tersalin ✓";
+  setTimeout(()=>b.textContent = old, 1500);
+};
+document.getElementById("btnWA").onclick = ()=>{
+  const txt = document.getElementById("report").value;
+  window.open("https://wa.me/?text="+encodeURIComponent(txt), "_blank");
+};
+document.getElementById("btnJSON").onclick = ()=>{
+  const r = reportText();
+  const payload = {
+    app: "CekLaptop", tanggal: new Date().toISOString(),
+    sistem: {
+      layar: screen.width+"x"+screen.height+"@"+devicePixelRatio+"x",
+      refreshRate: sysInfo.hz, gpu: sysInfo.gpu,
+      coreCPU: navigator.hardwareConcurrency||null,
+      ramMinGB: navigator.deviceMemory||null,
+      layarSentuh: HAS_TOUCH ? navigator.maxTouchPoints : 0,
+    },
+    keyboard: window.__kbdStats ? window.__kbdStats() : null,
+    ringkasan: {lolos:r.pass, gagal:r.fail, dilewati:r.skip, belum:r.total-r.done},
+    penilaian: state,
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "cek-laptop-"+Date.now()+".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+document.getElementById("btnReset").onclick = ()=>{
+  if (!confirm("Hapus semua hasil penilaian?")) return;
+  state = {}; store.clear(); save();
+  renderVerdicts(); updateSummary();
+  document.getElementById("keyReset").click();
+  document.querySelectorAll(".click-target").forEach(el=>{
+    el.classList.remove("done","bad");
+    el.textContent = el.textContent.replace(/^[✓✗] /,"");
+  });
+  location.reload();
+};
+
+/* ============ Salin perintah toolkit ============ */
+document.querySelectorAll(".btn-copy-cmd").forEach(b=>{
+  b.onclick = async ()=>{
+    const cmd = b.parentElement.querySelector("code").textContent;
+    try { await navigator.clipboard.writeText(cmd); }
+    catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = cmd; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy"); ta.remove();
+    }
+    const old = b.textContent; b.textContent = "✓";
+    setTimeout(()=>b.textContent = old, 1200);
+  };
+});
+
+renderVerdicts();
+updateSummary();
+</script>
+</body>
+</html>
